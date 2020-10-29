@@ -42,3 +42,7 @@ variable "ami" {
     //features: AWS command line tools, Python, Ruby, Perl, and Java.
     default = "ami-01fee56b22f308154" 
 }
+
+variable "availability_zone" {
+    default = "us-west-2b"
+}

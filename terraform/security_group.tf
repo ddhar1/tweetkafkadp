@@ -1,6 +1,6 @@
 resource "aws_security_group" "kafka_ports" {
     description = "Security group for opening ports used by kafka"
-    vpc_id = "aws_vpc.prod-vpc.id"
+    vpc_id = aws_vpc.prod-vpc.id
 
     egress {
         from_port = 0
@@ -30,7 +30,7 @@ resource "aws_security_group" "kafka_ports" {
 
 resource "aws_security_group" "web" {
     description = "Allow web traffic from internet"
-
+    vpc_id = aws_vpc.prod-vpc.id
     ingress {
         from_port = 80
         to_port = 80
@@ -42,7 +42,7 @@ resource "aws_security_group" "web" {
 
 resource "aws_security_group" "ssh" {
     description = "Security group to allow SSH"
-
+    vpc_id = aws_vpc.prod-vpc.id
     ingress {
         from_port = 22
         to_port = 22

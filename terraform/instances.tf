@@ -14,6 +14,9 @@ resource "aws_instance" "broker" {
     associate_public_ip_address = true
     source_dest_check = false
 
+    tags= {
+        Name = "broker_${count.index}_${var.aws_instance_type["broker"]}"
+    }
 
 
 }
@@ -34,6 +37,9 @@ resource "aws_instance" "zookeeper" {
     associate_public_ip_address = true
     source_dest_check = false
 
+    tags ={
+        Name = "zookeeper_${count.index}_${var.aws_instance_type["broker"]}"
+    }
 
 
 }

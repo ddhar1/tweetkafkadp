@@ -29,8 +29,8 @@ variable "aws_instance_type" {
 
     type = map
     default = {
-        "zookeeper" = "t2.micro" //"t2.large"
-        "broker" = "t2.micro"
+        "zookeeper" = "t2.large" //"t2.large"
+        "broker" = "t2.medium" // "t2.micro"
         
     }
 

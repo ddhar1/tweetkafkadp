@@ -20,12 +20,43 @@ resource "aws_security_group" "kafka_ports" {
     }
 
     ingress {
+        from_port = 2181
+        to_port = 2181
+        protocol = "tcp"
+        cidr_blocks =["0.0.0.0/0"]
+        description = "Zookeeper"
+    }
+
+    ingress {
+        from_port = 2888
+        to_port = 2888
+        protocol = "tcp"
+        cidr_blocks =["0.0.0.0/0"]
+        description = "Zookeeper"
+    }
+
+
+    ingress {
         description = "Kafka Brokers"
         from_port = 9092
         to_port = 9092
         protocol = "tcp"
         cidr_blocks =["0.0.0.0/0"]
     }
+
+
+
+
+
+    ingress {
+        description = "Kafka Brokers"
+        from_port = 9021
+        to_port = 9021
+        protocol = "tcp"
+        cidr_blocks =["0.0.0.0/0"]
+    }
+
+
 
         ingress {
         description = "HTTP"

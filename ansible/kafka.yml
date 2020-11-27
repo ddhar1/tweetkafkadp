@@ -1,0 +1,81 @@
+- name: Download, install kafka on all servers
+  hosts: all
+  tasks:
+    # https://swiftotter.com/technical/amazon-aws-jenkins-2-60-1-java-8-update#/
+  # - name: Install yum packages
+  #   become: True
+  #   yum:
+  #     name: ['java-1.8.0-openjdk.x86_64'] 
+  # - name: set java with 1.8
+  #   become: True
+  #   shell: /usr/sbin/alternatives --set java /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
+  # - name: set javac with 1.8
+  #   become: True
+  #   shell: /usr/sbin/alternatives --set javac /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/javac
+  # - name: Remove Java 1.7
+  #   become: True
+  #   yum:
+  #     name: ['java-1.7']
+  #     state: absent
+  - name: Download Kafka 
+    get_url: 
+      url: https://mirrors.koehn.com/apache/kafka/2.6.0/kafka_2.12-2.6.0.tgz 
+      dest: ~/.
+  - name: Unpack the tar
+    shell: tar -xzvf ~/kafka_2.12-2.6.0.tgz 
+
+  - name: Copy Kafka into place
+    shell: mv ~/kafka_2.12-2.6.0  ~/kafka
+        
+  # - name: Open firewall ports
+  #       become: True
+  #       firewalld:
+  #         port: "{{ item }}"
+  #         permanent: yes
+  #         state: enabled
+  #       loop:
+  #         - 2181/tcp
+  #         - 9092/tcp
+
+
+- name: Zookeeper
+  hosts: zookeeper
+  tasks:
+    - name: Start server
+      shell: nohup ~/kafka/bin/zookeeper-server-start.sh ~/kafka/config/zookeeper.properties &
+
+- name: setup broker logs
+  hosts: brokers
+  tasks:
+    - name: make log directory
+      shell: cd kafka && mkdir logs
+
+- hosts: broker0
+  tasks:
+  - name: set up server0 config
+    copy:
+      src: ./server_configs/server0/server.properties
+      dest: ~/kafka/config
+      force: yes
+
+- hosts: broker1
+  tasks:
+  - name: set up server1 config
+    copy:
+      src: ./server_configs/server1/server.properties
+      dest: ~/kafka/config
+      force: yes
+
+- hosts: broker2
+  tasks:
+  - name: set up server2 config
+    copy:
+      src: ./server_configs/server2/server.properties
+      dest: ~/kafka/config
+      force: yes
+
+- name: start brokers
+  hosts: brokers
+  tasks:
+    - name: Start server
+      shell: nohup ~/kafka/bin/kafka-server-start.sh ~/kafka/config/server.properties &

@@ -1,6 +1,8 @@
 resource "aws_security_group" "kafka_ports" {
     description = "Security group for opening ports used by kafka"
-    vpc_id = "aws_vpc.prod-vpc.id"
+    vpc_id = aws_vpc.prod-vpc.id
+
+    name = "Public Access"
 
     egress {
         from_port = 0
@@ -18,37 +20,76 @@ resource "aws_security_group" "kafka_ports" {
     }
 
     ingress {
+        from_port = 2181
+        to_port = 2181
+        protocol = "tcp"
+        cidr_blocks =["0.0.0.0/0"]
+        description = "Zookeeper"
+    }
+
+    ingress {
+        from_port = 2888
+        to_port = 2888
+        protocol = "tcp"
+        cidr_blocks =["0.0.0.0/0"]
+        description = "Zookeeper"
+    }
+
+
+    ingress {
+        description = "Kafka Brokers"
         from_port = 9092
         to_port = 9092
         protocol = "tcp"
         cidr_blocks =["0.0.0.0/0"]
-        description = "Kafka Brokers"
     }
 
 
-}
 
-resource "aws_security_group" "web" {
-    description = "Allow web traffic from internet"
+
 
     ingress {
+        description = "Kafka Brokers"
+        from_port = 9021
+        to_port = 9021
+        protocol = "tcp"
+        cidr_blocks =["0.0.0.0/0"]
+    }
+
+
+
+        ingress {
+        description = "HTTP"
         from_port = 80
         to_port = 80
         protocol = "tcp"
         cidr_blocks =["0.0.0.0/0"]
     }
 
-}
-
-resource "aws_security_group" "ssh" {
-    description = "Security group to allow SSH"
-
     ingress {
+        description = "HTTP"
+        from_port = 2049
+        to_port = 2049
+        protocol="tcp"
+        cidr_blocks=["0.0.0.0/0"]
+    }
+    
+    ingress {
+        description = "ssh"
         from_port = 22
         to_port = 22
         protocol = "tcp"
         cidr_blocks = ["0.0.0.0/0"]
     }
 
+    ingress {
+        description="ICMP"
+        from_port= 0
+        to_port = 0
+        protocol = "-1"
+        cidr_blocks = ["0.0.0.0/0"]
+    }
+
 
 }
+

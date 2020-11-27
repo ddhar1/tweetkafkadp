@@ -29,8 +29,8 @@ variable "aws_instance_type" {
 
     type = map
     default = {
-        "zookeeper" = "t2.micro" //"t2.large"
-        "broker" = "t2.micro"
+        "zookeeper" = "t2.large" //"t2.large"
+        "broker" = "t2.medium" // "t2.micro"
         
     }
 
@@ -41,4 +41,8 @@ variable "ami" {
 
     //features: AWS command line tools, Python, Ruby, Perl, and Java.
     default = "ami-01fee56b22f308154" 
+}
+
+variable "availability_zone" {
+    default = "us-west-2b"
 }

@@ -1,0 +1,35 @@
+- name: Zookeeper restart
+  hosts: zookeeper
+  tasks:
+    - name: Start server
+      shell: nohup ~/kafka/bin/zookeeper-server-start.sh ~/kafka/config/zookeeper.properties &
+
+- hosts: broker0
+  tasks:
+  - name: upload new kafka server config file for broker0
+    copy:
+      src: ./server_configs/server0/server.properties
+      dest: ~/kafka/config
+      force: yes
+
+- hosts: broker1
+  tasks:
+  - name: upload new kafka server config file for broker1
+    copy:
+      src: ./server_configs/server1/server.properties
+      dest: ~/kafka/config
+      force: yes
+
+- hosts: broker2
+  tasks:
+  - name:  upload new kafka server config file for broker2
+    copy:
+      src: ./server_configs/server2/server.properties
+      dest: ~/kafka/config
+      force: yes
+
+- name: start brokers
+  hosts: brokers
+  tasks:
+    - name: Start kafka brokers again
+      shell: nohup ~/kafka/bin/kafka-server-start.sh ~/kafka/config/server.properties &

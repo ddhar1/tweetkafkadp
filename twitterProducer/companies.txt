@@ -1,7 +1,7 @@
-Tesla
-Walmart
-Facebook
-Snowflake
-Dropbox
-Atlassian
-Asana
+tesla
+walmart
+facebook
+snowflake
+dropbox
+atlassian
+asana

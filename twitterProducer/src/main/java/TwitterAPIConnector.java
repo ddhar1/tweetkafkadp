@@ -1,4 +1,4 @@
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
+
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -17,9 +17,9 @@ import java.io.*;
 import java.net.URISyntaxException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 
 public class TwitterAPIConnector {
-
     private static String bearerToken;
     private static TwitterProducer twitterProducer;
     private  Map<String, String> rules;
@@ -29,19 +29,18 @@ public class TwitterAPIConnector {
 
     public TwitterAPIConnector() throws IOException, URISyntaxException {
         initBearerToken();
-        twitterProducer = new TwitterProducer("twitter_on_stocks");
+
         rules = new HashMap<String, String>();
-        addRulesfromFile("./companies.txt");
-        setupRules(bearerToken, rules);
-        connectStream(bearerToken);
     }
+
+
 
     private static void initBearerToken()
     {
         bearerToken = System.getenv("BEARER_TOKEN");
-        if (null != bearerToken)
+        if (null == bearerToken)
         {
-            throw new ValueException("System doesn't have environmental variable BEARER_TOKEN set");
+            throw new NullPointerException("System doesn't have environmental variable BEARER_TOKEN set");
         }
     }
 
@@ -50,11 +49,17 @@ public class TwitterAPIConnector {
         return bearerToken;
     }
 
+    public static void sendTweetStreamToKafka(String TOPIC_NAME, String bootstrapServers, int minTilSleep ) throws IOException, URISyntaxException {
+
+        twitterProducer = new TwitterProducer(TOPIC_NAME, bootstrapServers);
+        connectStream( getBearerToken(), minTilSleep );
+    }
+
 
     /*
      * This method calls the filtered stream endpoint and streams Tweets from it
      * */
-    private static void connectStream(String bearerToken) throws IOException, URISyntaxException {
+    private static void connectStream(String bearerToken, int minTilSleep) throws IOException, URISyntaxException {
         // Set up formatter
         SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd  HH:mm:ss z");
         formatter.setTimeZone(TimeZone.getTimeZone("Pacific/Tahiti"));
@@ -75,7 +80,8 @@ public class TwitterAPIConnector {
         if (null != entity) {
             BufferedReader reader = new BufferedReader(new InputStreamReader((entity.getContent())));
             String line = reader.readLine();
-            while (line != null) {
+            long stop=System.nanoTime()+ TimeUnit.SECONDS.toNanos(minTilSleep*60 );
+            while (line != null &  stop>System.nanoTime() ) {
 
 
                 // without the tag 'created_at'
@@ -106,6 +112,10 @@ public class TwitterAPIConnector {
         createRules(bearerToken, rules);
     }
 
+    public static void createRules( Map<String, String> rules) throws IOException, URISyntaxException {
+        createRules(getBearerToken(), rules);
+    }
+
     /*
      * Helper method to create rules for filtering
      * */
@@ -129,6 +139,10 @@ public class TwitterAPIConnector {
             System.out.print("Response from API after creating rules");
             System.out.println(EntityUtils.toString(entity, "UTF-8"));
         }
+    }
+
+    public List<String> getRules() throws IOException, URISyntaxException {
+        return getRules(getBearerToken());
     }
 
     /*
@@ -184,6 +198,14 @@ public class TwitterAPIConnector {
         }
     }
 
+    public static void deleteAllRules() throws IOException, URISyntaxException {
+        List<String> existingRules = getRules(getBearerToken());
+        if (existingRules.size() > 0) {
+            deleteRules(getBearerToken(), existingRules);
+        }
+    }
+
+
     private static String getFormattedString(String string, List<String> ids) {
         StringBuilder sb = new StringBuilder();
         if (ids.size() == 1) {
@@ -213,14 +235,16 @@ public class TwitterAPIConnector {
         }
     }
 
-    public void addRulesfromFile(String path) throws FileNotFoundException {
+    public void addRulesfromFile(String path) throws IOException, URISyntaxException {
         rules = new HashMap<String, String>();
         Scanner scanner = new Scanner(new File(path));
         while (scanner.hasNextLine()) {
             String company = scanner.nextLine();
-            rules.put("entity: \"" + company + "\"" + " sample:" + Integer.toString(TWEETSAMPLEVALUE) +
-                    "lang:en", company);
+            rules.put("entity:" + company + " sample:" + Integer.toString(TWEETSAMPLEVALUE) +
+                    " lang:en", company);
 
         }
+
+        createRules(bearerToken, rules);
     }
 }

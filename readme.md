@@ -34,6 +34,9 @@ The business use case can be for an investment firm who wants to understand the 
 
 ## Set up:
 Pre-set up:
+* Twitter API:
+    1. [Get approval](https://developer.twitter.com/en/apply-for-access) for setting up a Twitter API account
+    2. Create API Keys as [per instructions here](https://developer.twitter.com/en/docs/twitter-api/tweets/filtered-stream/quick-start)
 * Install Terraform, Ansible
 * If you are running the Producer from your computer, install Java. If not, then you could save the producer as a .jar file and then run it as a daemon process on a server.
 * Make sure `terraform/variables.tf` and `ansible/hosts.yml`uses the profile that you have the private key for. This will be the key pair you would use in 

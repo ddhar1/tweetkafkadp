@@ -14,25 +14,27 @@ The business use case can be for an investment firm who wants to understand the 
     
 
 ### Design Choices
-* Terraform: Easy to setup and takedown AWS resources
-* Ansible: Easy to manage tasks to run on multiple hosts, programmatically
-* Kafka 
-    * Primarily chosen in order to get experience with setting up my own Kafka cluster!
-    * Could make more sense to use a managed Kafka service AWS MSK given the costs
-    * Kafka is a good choice if multiple services need to access data same data, there is an order to the data 
-    * Can also potentialy help ensure fault tolerance - if one 
+I chose to use **Kafka** in order to get experience with setting up my own Kafka cluster! **Ansible** was helpful with installing Kafka on all the hosts programatically, restarting kafka cluster, as well as documenting steps programatically for transparency, reproducibility.
+
+In a production environment, it may make more sense to *not* use self-managed kafka cluster. I would probably choose AWS Kinesis for this simple, low-streaming-rate application. 
+
+To fully flesh out reasoning, the alternatives could be:
+* Send tweets straight to simple socket ([example](https://towardsdatascience.com/sentiment-analysis-on-streaming-twitter-data-using-spark-structured-streaming-python-fc873684bfe3)) and then send data in socket to Spark Structured Streaming application in AWS EMR. This makes sense if the AWS EMR application is the only 'consumer' of the tweet data involved in this project, and the rate of data being streamed is constant and predictable (Kafka seems easier to scale), and it's fine for the application to go down and miss capturing some streams 
+* Use a managed service like AWS MSK or Kinesis. This makes sense if multiple consumers need to access data, I'm on a project with limited time and $ resources to maintain a kafka cluster. Whether AWS MSK or Kinesis is better depends on multiple factors including costs, importance of data (whether data can be missed and replicated data is necessary), and throughput required for job. 
+
+Other design choices:
 * AWS EMR:
     * **Easy** to set up, and doesn't require much maintanence work
     * **Cost**: I am paying for the maintanence of the cluster
-* Spark Structured Streaming:
-    * **Replace Kafka?**: Theoretically I could send the data from the filtered streaming api straight to Spark without storing it in Kafka
-    * One can **Track Offets being read from Kafka** which is useful in case the application goes offline, and it needs to be restarted 
-    * The amount of data gathered and saved to S3 in the next step can be adjusted by the `df.writeStream().trigger()` setting. Another spark application would have an easier time with larger parquet files, where the trigger is a large number of minutes. A shorter trigger may be better if the data needed to be immediately used 
+    * Spark Structured Streaming:
+        * One can **Track Offets being read from Kafka** which is useful in case the application goes offline, and it needs to be restarted 
+        * The amount of data gathered and saved to a parquet part in S3 in the next step can be adjusted by the `df.writeStream().trigger()` setting. Another spark application would have an easier time with reading large parquet files vs multiple small ones, where the trigger is a large number of minutes. A shorter trigger may be better if the data needed to be immediately used for something downstream
+        * You can apply transformations and Spark ML Models on streamed data. If I wasn't saving the streamed data in S3, and using Postgres, I could consider using a tool like 
 * **S3**
     * Has event notifications which can alert Snowflake, or another service that there is new data to ingest
     * I can also easily query the data in s3 with AWS Athena
-
-
+* **Terraform**: Very easy to set up and takedown AWS Resources. Also useful to easily document resources used
+* **Java vs Python**: May make more sense to stick to one language in a production environment. But I wanted to play around with Java OOP
 
 
 ## Set up:

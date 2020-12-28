@@ -47,11 +47,12 @@ Pre-set up:
 * Make sure `terraform/variables.tf` and `ansible/hosts.yml`uses the profile that you have the private key for. This will be the key pair you would use in 
 
 ### 1. Set up Kafka Cluster 
-1. Set up Terraform: Go to ./terraform. Ensure that 
+1. Set up Terraform: Go to ./terraform
 2. Run `terraform plan` to ensure that there are no issues with the terraform plan
 3. Run `terraform apply` to create aws resources
 ### 2. Run Twitter Producer
-
+Add `BEARER_TOKEN` as environmental variable to system. One may initially run unit tests in `./twitterProducer/src/tests/.` to ensure that it's working
+1. Currently I run java project from IDE
 ### 3. Run Twitter Consumer on AWS EMR
 
 ## Future Improvements:

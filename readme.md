@@ -3,7 +3,7 @@ Goal of this project is to play with Spark, AWS EMR, Spark Streaming data, Terra
 
 ## Business Use Case
 
-The business use case can be for an investment firm who wants to understand the public's opinion about certain companies in order to see if there's as correlation between this and future stock prices. Unfortunately live stock price API is very costly so this will not be incorporated in this project. I may add an extra pipeline that gets the daily stock prices and puts them in S3
+The business use case can be for an investment firm. They may wants to understand the public's opinion about certain companies to see if there's as correlation between this and future stock prices. Unfortunately live stock price API is very costly so this will not be incorporated in this project. I may add an extra pipeline that gets the daily stock prices and puts them in S3
 
 ## Architecture
 ![Pipeline of Data](_img/architecture.png)

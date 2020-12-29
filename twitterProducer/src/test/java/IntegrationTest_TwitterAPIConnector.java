@@ -1,10 +1,18 @@
+/*
+Check that Twitter API is working
+ */
+
 import org.junit.jupiter.api.Test;
 
 import java.io.IOException;
 import java.net.URISyntaxException;
 
-class TwitterAPIConnectorTest {
-
+class IntegrationTest_TwitterAPIConnector {
+    @Test
+    public void testCheckBearerToken() {
+        String BEARER_TOKEN = System.getenv("BEARER_TOKEN");
+        assert( BEARER_TOKEN != null );
+    }
 
     @Test
     public void testAddRulesfromFile() throws IOException, URISyntaxException {

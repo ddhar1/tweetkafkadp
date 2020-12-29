@@ -13,16 +13,17 @@ public class TwitterProducer {
 
     private KafkaProducer<String, String> producer;
     private String topicName;
-
-    public TwitterProducer( String topicName )
+    private String bootstrapServers;
+    public TwitterProducer(String topicName, String bootstrapServers)
     {
+        this.bootstrapServers = bootstrapServers;
         this.producer = createKafkaProducer();
         this.topicName = topicName;
+
     }
 
 
-    public static KafkaProducer<String, String> createKafkaProducer(){
-        String bootstrapServers = "127.0.0.1:9092";
+    public KafkaProducer<String, String> createKafkaProducer(){
 
         // create Producer properties
         Properties properties = new Properties();

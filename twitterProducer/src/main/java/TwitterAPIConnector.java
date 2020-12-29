@@ -12,6 +12,7 @@ import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.HttpClients;
 import org.apache.http.util.EntityUtils;
+import org.apache.log4j.Logger;
 import org.json.JSONArray;
 import org.json.JSONObject;
 
@@ -28,15 +29,22 @@ public class TwitterAPIConnector {
 
     //50 requests per 15-minute window (app auth)
     private static int TWEETSAMPLEVALUE = 50;
-
+    private Logger log;
     public TwitterAPIConnector() throws IOException, URISyntaxException {
-        initBearerToken();
-
+        log = Logger.getLogger(this.getClass().getName());
+        try {
+            initBearerToken();
+        }
+        catch ( NullPointerException e){
+            log.fatal("Bearer token is null", e);
+        }
         rules = new HashMap<String, String>();
     }
 
 
-
+    /*
+    Check system for Bearer token and initialize it as private string
+     */
     private static void initBearerToken()
     {
         bearerToken = System.getenv("BEARER_TOKEN");
@@ -46,22 +54,29 @@ public class TwitterAPIConnector {
         }
     }
 
+    /*
+    Return private bearerToken
+     */
     private static String getBearerToken()
     {
         return bearerToken;
     }
-
-    public static void sendTweetStreamToKafka(String TOPIC_NAME, String bootstrapServers, int minTilSleep ) throws IOException, URISyntaxException {
+    /*
+        Creates TwitterProducer based on input topic and servers from main method
+        connects for a certain number of minutes
+        In production, this would be fixed to allow application to run til force quit
+     */
+    public void sendTweetStreamToKafka(String TOPIC_NAME, String bootstrapServers, int minTilSleep ) throws IOException, URISyntaxException {
 
         twitterProducer = new TwitterProducer(TOPIC_NAME, bootstrapServers);
-        connectStream( getBearerToken(), minTilSleep );
+        connectStream( minTilSleep );
     }
 
 
     /*
      * This method calls the filtered stream endpoint and streams Tweets from it
      * */
-    private static void connectStream(String bearerToken, int minTilSleep) throws IOException, URISyntaxException {
+    private  void connectStream(int minTilSleep) throws IOException, URISyntaxException {
         // Set up formatter
         SimpleDateFormat formatter= new SimpleDateFormat("yyyy-MM-dd  HH:mm:ss z");
         formatter.setTimeZone(TimeZone.getTimeZone("Pacific/Tahiti"));
@@ -75,10 +90,12 @@ public class TwitterAPIConnector {
         URIBuilder uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/search/stream?tweet.fields=created_at");
 
         HttpGet httpGet = new HttpGet(uriBuilder.build());
-        httpGet.setHeader("Authorization", String.format("Bearer %s", bearerToken));
+        httpGet.setHeader("Authorization", String.format("Bearer %s", getBearerToken()));
 
         HttpResponse response = httpClient.execute(httpGet);
         HttpEntity entity = response.getEntity();
+
+        log.info("Reading stream");
         if (null != entity) {
             BufferedReader reader = new BufferedReader(new InputStreamReader((entity.getContent())));
             String line = reader.readLine();
@@ -103,25 +120,30 @@ public class TwitterAPIConnector {
     }
 
     /*
-     * Helper method to setup rules before streaming data
-     * Deletes all rules that currently exist
+     * Deletes all rules that currently exist and adds a new list of rules
      * */
-    private static void setupRules(String bearerToken, Map<String, String> rules) throws IOException, URISyntaxException {
-        List<String> existingRules = getRules(bearerToken);
+    private void resetAndAddRules( Map<String, String> rules) throws IOException, URISyntaxException {
+        log.info("Deleting existing rules, setting up new rules");
+        List<String> existingRules = getRules();
         if (existingRules.size() > 0) {
-            deleteRules(bearerToken, existingRules);
+            deleteRules(getBearerToken(), existingRules);
         }
-        createRules(bearerToken, rules);
-    }
-
-    public static void createRules( Map<String, String> rules) throws IOException, URISyntaxException {
-        createRules(getBearerToken(), rules);
+        createRules( rules);
     }
 
     /*
-     * Helper method to create rules for filtering
+     Creates rules for filtering Twitter Filtered Stream API results
+     Create rules using Hash Map of rules
+     */
+    public void createRules( Map<String, String> rules) throws IOException, URISyntaxException {
+        log.info("Using list of rules to create rules");
+        createRulesHelper( rules );
+    }
+
+    /*
+     * Private Helper method to create rules for filtering Twitter Filtered Stream API results
      * */
-    private static void createRules(String bearerToken, Map<String, String> rules) throws URISyntaxException, IOException {
+    private void createRulesHelper( Map<String, String> rules) throws URISyntaxException, IOException {
         HttpClient httpClient = HttpClients.custom()
                 .setDefaultRequestConfig(RequestConfig.custom()
                         .setCookieSpec(CookieSpecs.STANDARD).build())
@@ -130,7 +152,7 @@ public class TwitterAPIConnector {
         URIBuilder uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/search/stream/rules");
 
         HttpPost httpPost = new HttpPost(uriBuilder.build());
-        httpPost.setHeader("Authorization", String.format("Bearer %s", bearerToken));
+        httpPost.setHeader("Authorization", String.format("Bearer %s", getBearerToken()));
         httpPost.setHeader("content-type", "application/json");
         StringEntity body = new StringEntity(getFormattedString("{\"add\": [%s]}", rules));
         httpPost.setEntity(body);
@@ -142,15 +164,17 @@ public class TwitterAPIConnector {
             System.out.println(EntityUtils.toString(entity, "UTF-8"));
         }
     }
-
+    /*
+    Public method to get rules from the API
+     */
     public List<String> getRules() throws IOException, URISyntaxException {
-        return getRules(getBearerToken());
+        return getRulesHelper();
     }
 
     /*
-     * Helper method to get existing rules
+     * Helper method to get existing rules associated with bearer_token
      * */
-    private static List<String> getRules(String bearerToken) throws URISyntaxException, IOException {
+    private List<String> getRulesHelper() throws URISyntaxException, IOException {
         List<String> rules = new ArrayList<String>();
         HttpClient httpClient = HttpClients.custom()
                 .setDefaultRequestConfig(RequestConfig.custom()
@@ -160,7 +184,7 @@ public class TwitterAPIConnector {
         URIBuilder uriBuilder = new URIBuilder("https://api.twitter.com/2/tweets/search/stream/rules");
 
         HttpGet httpGet = new HttpGet(uriBuilder.build());
-        httpGet.setHeader("Authorization", String.format("Bearer %s", bearerToken));
+        httpGet.setHeader("Authorization", String.format("Bearer %s", getBearerToken()));
         httpGet.setHeader("content-type", "application/json");
         HttpResponse response = httpClient.execute(httpGet);
         HttpEntity entity = response.getEntity();
@@ -178,9 +202,9 @@ public class TwitterAPIConnector {
     }
 
     /*
-     * Helper method to delete rules
+     * Helper method to delete rules associated with API
      * */
-    private static void deleteRules(String bearerToken, List<String> existingRules) throws URISyntaxException, IOException {
+    private void deleteRules(String bearerToken, List<String> existingRules) throws URISyntaxException, IOException {
         HttpClient httpClient = HttpClients.custom()
                 .setDefaultRequestConfig(RequestConfig.custom()
                         .setCookieSpec(CookieSpecs.STANDARD).build())
@@ -199,16 +223,20 @@ public class TwitterAPIConnector {
             System.out.println(EntityUtils.toString(entity, "UTF-8"));
         }
     }
-
-    public static void deleteAllRules() throws IOException, URISyntaxException {
-        List<String> existingRules = getRules(getBearerToken());
+    /*
+    Deletes all rules associated with the API Key
+     */
+    public void deleteAllRules() throws IOException, URISyntaxException {
+        List<String> existingRules = getRules();
         if (existingRules.size() > 0) {
             deleteRules(getBearerToken(), existingRules);
         }
     }
 
-
-    private static String getFormattedString(String string, List<String> ids) {
+    /*
+    Get Formatted string when given list of ids
+     */
+    private String getFormattedString(String string, List<String> ids) {
         StringBuilder sb = new StringBuilder();
         if (ids.size() == 1) {
             return String.format(string, "\"" + ids.get(0) + "\"");
@@ -220,8 +248,10 @@ public class TwitterAPIConnector {
             return String.format(string, result.substring(0, result.length() - 1));
         }
     }
-
-    private static String getFormattedString(String string, Map<String, String> rules) {
+    /*
+    Returns a string representation of rules from the API
+     */
+    private String getFormattedString(String string, Map<String, String> rules) {
         StringBuilder sb = new StringBuilder();
         if (rules.size() == 1) {
             String key = rules.keySet().iterator().next();
@@ -247,6 +277,6 @@ public class TwitterAPIConnector {
 
         }
 
-        createRules(bearerToken, rules);
+        createRules( rules);
     }
 }

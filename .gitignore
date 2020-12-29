@@ -5,3 +5,7 @@ terraform.tfstate*
 #misc local files
 .misc/*
 .screenshots/*
+
+#Java files
+twitterProducer/.idea/*
+twitterProducer/.target/*

@@ -11,18 +11,18 @@ import java.util.Properties;
 
 public class TwitterProducer {
 
-    private KafkaProducer<String, String> producer;
     private String topicName;
+    private KafkaProducer<String, String> producer;
 
-    public TwitterProducer( String topicName )
+    public TwitterProducer( String topicName, String bootstrapServers )
     {
-        this.producer = createKafkaProducer();
+        this.producer = createKafkaProducer(bootstrapServers);
         this.topicName = topicName;
     }
 
 
-    public static KafkaProducer<String, String> createKafkaProducer(){
-        String bootstrapServers = "127.0.0.1:9092";
+    public static KafkaProducer<String, String> createKafkaProducer(String bootstrapServers){
+
 
         // create Producer properties
         Properties properties = new Properties();
@@ -46,7 +46,7 @@ public class TwitterProducer {
         return producer;
     }
 
-    public ProducerRecord<String, String> createProducerRecord(  String message)
+    public ProducerRecord<String, String> createProducerRecord(  String message )
     {
         return new ProducerRecord<String, String>( this.topicName, message );
     }

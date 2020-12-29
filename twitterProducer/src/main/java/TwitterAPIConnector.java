@@ -1,4 +1,6 @@
-
+/*
+Connects to Twitter Stream and sends tweets to kafa using TwitterProducer
+ */
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;

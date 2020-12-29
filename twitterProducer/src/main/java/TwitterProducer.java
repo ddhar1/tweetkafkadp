@@ -1,5 +1,5 @@
 /*
-    Meant to handle everything related to Kafka
+   Connect to kafka and prepare messages to send to Kafka
  */
 
 

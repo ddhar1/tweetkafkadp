@@ -10,3 +10,4 @@ terraform.tfstate*
 twitterProducer/.idea/*
 twitterProducer/.target/*
 twitterProducer/log/*
+twitterProducer/target/*

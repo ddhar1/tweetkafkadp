@@ -8,6 +8,8 @@ import java.net.URISyntaxException;
 import java.util.*;
 
 public class FilteredStreamDemo {
+    public static String TOPIC_NAME = "twitter_on_stocks";
+    public static String bootstrapServers = "34.213.179.50:9092";
 
     public static void main(String args[]) throws IOException, URISyntaxException {
         // Start logging
@@ -22,7 +24,7 @@ public class FilteredStreamDemo {
 
         log.info("Sending tweets to twitter");
         try {
-            //twitterAPIConnector.sendTweetStreamToKafka( TOPIC_NAME, bootstrapServers, 2 );
+            twitterAPIConnector.sendTweetStreamToKafka( TOPIC_NAME, bootstrapServers, 2 );
         }
         catch (Exception e) {
             log.fatal("twitterAPIConnector.sendTweetStreamToKafka failed. Please see logs", e);

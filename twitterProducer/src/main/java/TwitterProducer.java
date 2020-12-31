@@ -6,8 +6,11 @@
 import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
+import org.apache.kafka.clients.producer.internals.FutureRecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
 import java.util.Properties;
+import java.util.concurrent.Future;
 
 public class TwitterProducer {
 
@@ -52,9 +55,9 @@ public class TwitterProducer {
         return new ProducerRecord<String, String>( this.topicName, message );
     }
 
-    public void sendMessage( String message )
+    public Future<RecordMetadata> sendMessage(String message )
     {
-        producer.send( this.createProducerRecord(message) );
+        return producer.send( this.createProducerRecord(message) );
     }
 
     public void flushProducer()

@@ -3,6 +3,7 @@ Tests TwitterProducer class to see if it can successfully send a record to a Kaf
  */
 
 import org.apache.kafka.clients.producer.ProducerRecord;
+import org.apache.kafka.clients.producer.RecordMetadata;
 import org.junit.AfterClass;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -11,6 +12,8 @@ import org.testcontainers.containers.KafkaContainer;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.TimeUnit;
 
 public class TwitterProducerTest {
     final public static String KAFKA_DOCKER_IMAGE = "confluentinc/cp-kafka:5.4.3";
@@ -20,6 +23,10 @@ public class TwitterProducerTest {
     public static String testMessage = "This is a Message, to be turned into a producer record";
     public static String topicName= "test_topic";
 
+    /*
+        Create Kafka Container, create topic
+        Create Twitter Producer to be tested
+     */
     @BeforeClass
     public static void setUpKafka() throws InterruptedException, IOException {
         // set up, start kafka test container
@@ -50,6 +57,18 @@ public class TwitterProducerTest {
         ProducerRecord<String, String> outputOfcreateProducerRecord  = twitterProducer.createProducerRecord(  testMessage );
 
         assert( outputOfcreateProducerRecord.equals( new ProducerRecord<String, String>( topicName, testMessage)  ) );
+    }
+
+    /*
+        Test sendMessage() method, to see if it can successfully sends message to a producer (given ACKS are required)
+     */
+    @Test(timeout = 60*100*5)
+    public void testSendValueToProducer() throws Exception {
+
+        // Send data to Kafka, Get recordMetaData to see if successful or not, Timeout because docker can be slow
+        RecordMetadata recordMetaData = twitterProducer.sendMessage( testMessage ).get(10, TimeUnit.SECONDS );
+
+        assert( recordMetaData.offset() == 0);
     }
 
 

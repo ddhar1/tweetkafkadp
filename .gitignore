@@ -9,5 +9,5 @@ terraform.tfstate*
 #Java files
 twitterProducer/.idea/*
 twitterProducer/.target/*
-twitterProducer/log/*
+twitterProducer/log/*.out
 twitterProducer/target/*

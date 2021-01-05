@@ -14,3 +14,4 @@ twitterProducer/target/*
 
 # Ansible for Kafka Set up files
 ansible/server_configs/server[0-9]/server.properties
+ansible/hosts.yml

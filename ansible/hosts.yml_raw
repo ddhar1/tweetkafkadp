@@ -10,13 +10,13 @@ all:
       children:
         broker0:
           hosts:
-            34.214.195.3: 
+            brokerserverid0: 
         broker1:
           hosts:
-            54.212.93.115:
+            brokerserverid1:
         broker2:
           hosts:
-            52.13.41.131: 
+            brokerserverid2: 
     zookeeper:
       hosts:
-        34.216.208.38:
+        zookeeperserverid:

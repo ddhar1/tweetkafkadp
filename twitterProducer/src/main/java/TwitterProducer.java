@@ -9,6 +9,8 @@ import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
 import org.apache.kafka.clients.producer.internals.FutureRecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
+import org.apache.log4j.Logger;
+
 import java.util.Properties;
 import java.util.concurrent.Future;
 
@@ -17,12 +19,16 @@ public class TwitterProducer {
     private KafkaProducer<String, String> producer;
     private String topicName;
     private String bootstrapServers;
+    private Logger log;
+
     public TwitterProducer(String topicName, String bootstrapServers)
     {
+        log = Logger.getLogger(this.getClass().getName());
         this.bootstrapServers = bootstrapServers;
         this.producer = createKafkaProducer();
+        log.info("Created Kafka Producer");
         this.topicName = topicName;
-
+        log.info("When using Kafka producer, Using topicName: " + topicName);
     }
 
 
@@ -60,14 +66,18 @@ public class TwitterProducer {
         return producer.send( this.createProducerRecord(message) );
     }
 
+
+
     public void flushProducer()
     {
+        log.info("Flushing producer");
         producer.flush();
     }
 
 
     public void closeProducer()
     {
+        log.info("Closing producer");
         producer.close();
     }
 

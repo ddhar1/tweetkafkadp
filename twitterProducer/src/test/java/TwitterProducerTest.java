@@ -9,11 +9,13 @@ import org.junit.BeforeClass;
 import org.junit.Test;
 import org.testcontainers.containers.Container;
 import org.testcontainers.containers.KafkaContainer;
+import org.testcontainers.shaded.com.trilead.ssh2.util.TimeoutService;
 import org.testcontainers.utility.DockerImageName;
 
 import java.io.IOException;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.TimeoutException;
 
 public class TwitterProducerTest {
     final public static String KAFKA_DOCKER_IMAGE = "confluentinc/cp-kafka:5.4.3";
@@ -69,6 +71,25 @@ public class TwitterProducerTest {
         RecordMetadata recordMetaData = twitterProducer.sendMessage( testMessage ).get(10, TimeUnit.SECONDS );
 
         assert( recordMetaData.offset() == 0);
+    }
+
+    /*
+        Tests sendMessage to see if it will fail
+        when trying to sendMessage to offline Kafka Cluster, and get RecordMetadata
+     */
+    @Test
+    public void testSendValueToFailedProducer() throws InterruptedException, ExecutionException {
+        kafka.stop();
+
+        Exception recordMetadataFailure = null;
+        try {
+            RecordMetadata recordMetadata = twitterProducer.sendMessage(testMessage).get();
+        }
+        catch ( Exception e ) {
+            recordMetadataFailure = e;
+        }
+
+        assert( recordMetadataFailure != null );
     }
 
 

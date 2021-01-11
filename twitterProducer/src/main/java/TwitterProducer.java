@@ -7,7 +7,6 @@ import org.apache.kafka.clients.producer.KafkaProducer;
 import org.apache.kafka.clients.producer.ProducerConfig;
 import org.apache.kafka.clients.producer.ProducerRecord;
 import org.apache.kafka.clients.producer.RecordMetadata;
-import org.apache.kafka.clients.producer.internals.FutureRecordMetadata;
 import org.apache.kafka.common.serialization.StringSerializer;
 import org.apache.log4j.Logger;
 
@@ -63,7 +62,12 @@ public class TwitterProducer {
 
     public Future<RecordMetadata> sendMessage(String message )
     {
-        return producer.send( this.createProducerRecord(message) );
+        return producer.send( this.createProducerRecord(message), (recordMetadata, exception) -> {
+            if (exception != null) {
+                log.error("When sending a record, an error occurred: ");
+                log.error( exception.getStackTrace() );
+            }
+        } );
     }
 
 

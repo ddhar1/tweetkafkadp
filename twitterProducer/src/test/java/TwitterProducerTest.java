@@ -64,11 +64,11 @@ public class TwitterProducerTest {
     /*
         Test sendMessage() method, to see if it can successfully sends message to a producer (given ACKS are required)
      */
-    @Test(timeout = 60*100*5)
+    @Test
     public void testSendValueToProducer() throws Exception {
 
         // Send data to Kafka, Get recordMetaData to see if successful or not, Timeout because docker can be slow
-        RecordMetadata recordMetaData = twitterProducer.sendMessage( testMessage ).get(10, TimeUnit.SECONDS );
+        RecordMetadata recordMetaData = twitterProducer.sendMessage( testMessage ).get();
 
         assert( recordMetaData.offset() == 0);
     }

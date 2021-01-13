@@ -1,22 +1,19 @@
 - name: Download, install kafka on all servers
   hosts: all
   tasks:
-    # https://swiftotter.com/technical/amazon-aws-jenkins-2-60-1-java-8-update#/
-  # - name: Install yum packages
-  #   become: True
-  #   yum:
-  #     name: ['java-1.8.0-openjdk.x86_64'] 
-  # - name: set java with 1.8
-  #   become: True
-  #   shell: /usr/sbin/alternatives --set java /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/java
-  # - name: set javac with 1.8
-  #   become: True
-  #   shell: /usr/sbin/alternatives --set javac /usr/lib/jvm/jre-1.8.0-openjdk.x86_64/bin/javac
-  # - name: Remove Java 1.7
-  #   become: True
-  #   yum:
-  #     name: ['java-1.7']
-  #     state: absent
+  - name: Install Java 1.8
+    become: yes
+    yum:
+      name:
+      - java-1.8.0
+      state: present
+  - name: Uninstall Java 1.7
+    become: yes
+    ignore_errors: yes
+    yum:
+      name: 
+      - java-1.7.0-openjdk
+      state: absent
   - name: Download Kafka 
     get_url: 
       url: https://downloads.apache.org/kafka/2.6.0/kafka_2.12-2.6.0.tgz 

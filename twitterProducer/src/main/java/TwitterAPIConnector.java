@@ -140,20 +140,13 @@ public class TwitterAPIConnector {
     }
 
 
+
     /*
      Creates rules for filtering Twitter Filtered Stream API results
      Create rules using Hash Map of rules
+     Private Helper method to create rules for filtering Twitter Filtered Stream API results
      */
-    public void createRules( Map<String, String> rules) throws IOException, URISyntaxException {
-        log.info("Using list of rules to create rules");
-        createRulesHelper( rules );
-    }
-
-
-    /*
-     * Private Helper method to create rules for filtering Twitter Filtered Stream API results
-     * */
-    private void createRulesHelper( Map<String, String> rules) throws URISyntaxException, IOException {
+    public void createRules( Map<String, String> rules) throws URISyntaxException, IOException {
         HttpClient httpClient = HttpClients.custom()
                 .setDefaultRequestConfig(RequestConfig.custom()
                         .setCookieSpec(CookieSpecs.STANDARD).build())
@@ -179,14 +172,6 @@ public class TwitterAPIConnector {
     Public method to get rules from the API
      */
     public List<String> getRules() throws IOException, URISyntaxException {
-        return getRulesHelper();
-    }
-
-
-    /*
-     * Helper method to get existing rules associated with bearer_token
-     * */
-    private List<String> getRulesHelper() throws URISyntaxException, IOException {
         List<String> rules = new ArrayList<String>();
         HttpClient httpClient = HttpClients.custom()
                 .setDefaultRequestConfig(RequestConfig.custom()
@@ -212,6 +197,8 @@ public class TwitterAPIConnector {
         }
         return rules;
     }
+
+
 
     /*
      * Helper method to delete rules associated with API

@@ -55,7 +55,7 @@ public class TwitterAPIConnector {
     private static void initBearerToken()
     {
         bearerToken = System.getenv("BEARER_TOKEN");
-        if (null != bearerToken)
+        if (null == bearerToken)
         {
             throw new RuntimeException("System doesn't have environmental variable BEARER_TOKEN set");
         }

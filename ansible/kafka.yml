@@ -23,7 +23,10 @@
 
   - name: Copy Kafka into place
     shell: mv ~/kafka_2.12-2.6.0  ~/kafka
-        
+
+  - name: make log directory
+    shell: cd kafka && mkdir logs
+
   # - name: Open firewall ports
   #       become: True
   #       firewalld:
@@ -33,19 +36,11 @@
   #       loop:
   #         - 2181/tcp
   #         - 9092/tcp
-
-
 - name: Zookeeper
   hosts: zookeeper
   tasks:
     - name: Start server
       shell: nohup ~/kafka/bin/zookeeper-server-start.sh ~/kafka/config/zookeeper.properties &
-
-- name: setup broker logs
-  hosts: brokers
-  tasks:
-    - name: make log directory
-      shell: cd kafka && mkdir logs
 
 - hosts: broker0
   tasks:

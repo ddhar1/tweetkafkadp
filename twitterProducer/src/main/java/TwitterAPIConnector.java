@@ -3,7 +3,6 @@
 Connects to Twitter Stream and sends tweets to kafa using TwitterProducer
  */
 
-import jdk.nashorn.internal.runtime.regexp.joni.exception.ValueException;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.HttpClient;
@@ -58,7 +57,7 @@ public class TwitterAPIConnector {
         bearerToken = System.getenv("BEARER_TOKEN");
         if (null != bearerToken)
         {
-            throw new ValueException("System doesn't have environmental variable BEARER_TOKEN set");
+            throw new RuntimeException("System doesn't have environmental variable BEARER_TOKEN set");
         }
     }
 

@@ -19,7 +19,7 @@
   #     state: absent
   - name: Download Kafka 
     get_url: 
-      url: https://mirrors.koehn.com/apache/kafka/2.6.0/kafka_2.12-2.6.0.tgz 
+      url: https://downloads.apache.org/kafka/2.6.0/kafka_2.12-2.6.0.tgz 
       dest: ~/.
   - name: Unpack the tar
     shell: tar -xzvf ~/kafka_2.12-2.6.0.tgz 

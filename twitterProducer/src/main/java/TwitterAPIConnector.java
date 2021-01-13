@@ -273,8 +273,8 @@ public class TwitterAPIConnector {
         Scanner scanner = new Scanner(new File(path));
         while (scanner.hasNextLine()) {
             String company = scanner.nextLine();
-            rules.put("entity: \"" + company + "\"" + " sample:" + Integer.toString(TWEETSAMPLEVALUE) +
-                    "lang:en", company);
+            rules.put("entity:" + company + "" + " sample:" + Integer.toString(TWEETSAMPLEVALUE) +
+                    " lang:en", company);
 
         }
 

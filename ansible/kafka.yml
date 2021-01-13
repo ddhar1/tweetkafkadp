@@ -26,16 +26,7 @@
 
   - name: make log directory
     shell: cd kafka && mkdir logs
-
-  # - name: Open firewall ports
-  #       become: True
-  #       firewalld:
-  #         port: "{{ item }}"
-  #         permanent: yes
-  #         state: enabled
-  #       loop:
-  #         - 2181/tcp
-  #         - 9092/tcp
+    
 - name: Zookeeper
   hosts: zookeeper
   tasks:

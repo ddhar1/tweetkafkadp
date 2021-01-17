@@ -41,7 +41,7 @@ tweets = df.selectExpr("CAST(value) AS str")
 
 tweets = tweets.select( f.from_json("value", json_schema).alias("value")  )
 
-tweets = tweets.selectExpr( "value.data.id as id", "value.data.created_at as created_at", "value.data.text as text" )#, "matching_rules.tag as company" )
+tweets = tweets.selectExpr( "CAST(value.data.id as BIGINT) AS id", "value.data.created_at AS created_at", "CAST(value.data.text as STRING) AS text", "LOWER(CAST(value.matching_rules.tag[0] AS STRING)) as tag"   )
 
 # Count words in the tweet
 tweets = tweets.withColumn( "word_count",  f.size(f.split(f.col('text'), ' '))  )

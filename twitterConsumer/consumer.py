@@ -4,11 +4,24 @@ from pyspark.sql import types as T
 #import boto3
 
 # Schema of Tweet and Tweet Metadata from Twitter API
-json_schema = T.StructType()
-  .add("data", T.StructType().add( "id", T.LongType ).add("created_at", ).add("text", T.StringType) )
-  .add("matching_rules", TStructType().add( "id", T.StringType ).add("tag", T.StringType) )
-
-
+json_schema =StructType([
+    StructField("data", 
+        StructType([ 
+                    StructField( "created_at", StringType(),  nullable = False )
+                    , StructField( "id", StringType(),  nullable = False)
+                    , StructField("text", StringType(),  nullable = False)
+               ])  
+        , nullable = False)
+    , StructField( "matching_rules",
+             ArrayType(StructType([ 
+                    StructField("id", StringType(), nullable = False)
+                , StructField("tag", StringType(), nullable= False)
+                ])
+                )
+            )
+    ])
+    
+    
 spark = SparkSession \
     .builder \
     .appName("StructuredNetworkWordCount") \
@@ -26,9 +39,9 @@ tweets = df.selectExpr("CAST(value) AS str")
 
 #df = df.selectExpr("data.id as id", "data.created_at as created_at", "data.text", "matching_rules.tag as company")
 
-tweets = tweets.select( f.from_json(tweets.value, json_schema).as("value")  ) 
+tweets = tweets.select( f.from_json("value", json_schema).alias("value")  )
 
-tweets = tweets.selectExpr( "value.data.id as id", "value.data.created_at as created_at", "value.data.text as text", "matching_rules.tag as company" )
+tweets = tweets.selectExpr( "value.data.id as id", "value.data.created_at as created_at", "value.data.text as text" )#, "matching_rules.tag as company" )
 
 # Count words in the tweet
 tweets = tweets.withColumn( "word_count",  f.size(f.split(f.col('text'), ' '))  )

@@ -1,7 +1,6 @@
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as f
 from pyspark.sql import types as T
-#import boto3
 
 # Schema of Tweet and Tweet Metadata from Twitter API
 json_schema =StructType([
@@ -37,20 +36,17 @@ df = spark \
 
 tweets = df.selectExpr("CAST(value) AS str")
 
-#df = df.selectExpr("data.id as id", "data.created_at as created_at", "data.text", "matching_rules.tag as company")
-
 tweets = tweets.select( f.from_json("value", json_schema).alias("value")  )
 
-tweets = tweets.selectExpr( "CAST(value.data.id as BIGINT) AS id", "value.data.created_at AS created_at", "CAST(value.data.text as STRING) AS text", "LOWER(CAST(value.matching_rules.tag[0] AS STRING)) as tag"   )
+tweets = tweets.selectExpr( "CAST(value.data.id as BIGINT) AS id", "value.data.created_at AS created_at", "CAST(value.data.text as STRING) AS text", "LOWER(CAST(value.matching_rules.tag[0] AS STRING)) as company"   )
 
 # Count words in the tweet
 tweets = tweets.withColumn( "word_count",  f.size(f.split(f.col('text'), ' '))  )
 
-# Classify tweets
-
 # Save set of data pulled from Kafka every 15 seconds
 df.writeStream.format("parquet"). \
-    option("checkpointLocation", "s3n://tweets1/"). \
+    option("checkpointLocation", "s3n://tweets1/checkpoints/"). \
+    option("output", "s3n://tweets1/data/")
     outputMode('append'). \
     trigger(processingTime='15 seconds'). \
     partitionBy('company')

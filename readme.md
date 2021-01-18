@@ -46,6 +46,8 @@ Pre-set up:
 * If you are running the Producer from your computer, install Java. If not, then you could save the producer as a .jar file and then run it as a daemon process on a server.
 * Make sure `terraform/variables.tf` and `ansible/hosts.yml`uses the profile that you have the private key for. This will be the key pair you would use in 
 
+**This guide is a work in progress**
+
 ### 1. Set up Kafka Cluster 
 1. Set up Terraform: Go to ./terraform
 2. Run `terraform plan` to ensure that there are no issues with the terraform plan

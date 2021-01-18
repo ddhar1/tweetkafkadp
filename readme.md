@@ -55,10 +55,11 @@ Add `BEARER_TOKEN` as environmental variable to system. One may initially run un
 1. Currently I run java project from IDE
 ### 3. Run Twitter Consumer on AWS EMR
 
-## Future Improvements:
-* Adjust NLP script to classify tweets using [John Snow Lab's NLP Library](https://nlp.johnsnowlabs.com/)
+## Possible Future Improvements
+* Continous Data quality checks on
+	* data that comes out of twitter api before it's sent to Kafka with TwitterProducer
+	* data from kafka in spark streaming, before it's saved as a parquet (tradeoff is that more latency)
+* if spark streaming program is affected - how to use checkpoint data to automatically start from most recently collected offset?
 * Save Producer as a .jar file, run as a daemon process on an EC2 Instance
-* Create unit tests for TwitterProducer - look into Mock Producer or Kafka on docker to avoid creating cluster for testing
-* In Spark Structured Streaming script - add offset value to column in order to track offsets in case job breaks (bonus: way to automatically restart job from point of last offset?)
-* Send data to dashboard, or to database using S3 event notifications
-* What would happen if AWS went down (such as when AWS east went down recently)
+* What would happen if AWS went down? (such as when AWS east went down recently)
+* Adjust NLP script to classify tweets using [John Snow Lab's NLP Library](https://nlp.johnsnowlabs.com/)

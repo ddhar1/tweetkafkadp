@@ -7,6 +7,9 @@ resource "aws_emr_cluster" "cluster" {
 
     service_role = "EMR_DefaultRole" #TODO: Insert role of choice\
 
+    log_uri = "s3://tweets1/emr-logs/"
+
+
     ec2_attributes {
         subnet_id = aws_subnet.prod-subnet-public-1.id
         emr_managed_master_security_group = aws_security_group.securitygroupforemr.id
@@ -34,6 +37,24 @@ resource "aws_emr_cluster" "cluster" {
     tags = {
         project = "tweetkafkadp"
     }
+
+
+    step {
+        action_on_failure = "TERMINATE_CLUSTER"
+        name ="Setup Hadoop Debugging"
+        
+        hadoop_jar_step {
+            jar = "command-runner.jar"
+            args = ["state-pusher-script"]
+        }
+
+    }
+
+
+    lifecycle {
+        ignore_changes =[step]
+    }
+
 
 }
 

@@ -44,9 +44,11 @@ tweets = tweets.selectExpr( "CAST(value.data.id as BIGINT) AS id", "value.data.c
 tweets = tweets.withColumn( "word_count",  f.size(f.split(f.col('text'), ' '))  )
 
 # Save set of data pulled from Kafka every 15 seconds
-df.writeStream.format("parquet"). \
+query = tweets.writeStream.format("parquet"). \
     option("checkpointLocation", "s3n://tweets1/checkpoints/"). \
-    option("output", "s3n://tweets1/data/")
+    option("path", "s3n://tweets1/tweet/"). \
     outputMode('append'). \
-    trigger(processingTime='15 seconds'). \
-    partitionBy('company')
+    trigger(processingTime='15 seconds'). \ # Adjust based on how real time data needs to be for analysis
+    partitionBy('company').start()
+
+query.awaitTermination()

@@ -34,7 +34,7 @@ df = spark \
   .option("subscribe", "twitter_on_stocks") \
   .load()
 
-tweets = df.selectExpr("CAST(value) AS str")
+tweets = df.selectExpr("CAST(value AS STRING)")
 
 tweets = tweets.select( f.from_json("value", json_schema).alias("value")  )
 

@@ -31,6 +31,7 @@ df = spark \
   .format("kafka") \
   .option("kafka.bootstrap.servers", "34.213.179.50:9092,34.220.78.168:9092,34.210.71.28:9092") \
   .option("subscribe", "twitter_on_stocks") \
+  .option("failOnDataLoss", "false") \
   .load()
 
 tweets = df.selectExpr("CAST(value AS STRING)")

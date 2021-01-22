@@ -1,26 +1,25 @@
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as f
-from pyspark.sql.types import ArrayType, IntegerType, LongType, StringType, TimestampType, StructType, StructField
+from pyspark.sql.types import ArrayType, StringType, StructType, StructField
 
 # Schema of Tweet and Tweet Metadata from Twitter API
 json_schema =StructType([
-    StructField("data", 
-        StructType([ 
+    StructField("data",
+        StructType([
                     StructField( "created_at", StringType(),  nullable = False )
                     , StructField( "id", StringType(),  nullable = False)
                     , StructField("text", StringType(),  nullable = False)
-               ])  
+               ])
         , nullable = False)
     , StructField( "matching_rules",
-             ArrayType(StructType([ 
+             ArrayType(StructType([
                     StructField("id", StringType(), nullable = False)
                 , StructField("tag", StringType(), nullable= False)
                 ])
                 )
             )
     ])
-    
-    
+
 spark = SparkSession \
     .builder \
     .appName("StructuredNetworkWordCount") \
@@ -48,7 +47,7 @@ query = tweets.writeStream.format("parquet"). \
     option("checkpointLocation", "s3n://tweets1/checkpoints/"). \
     option("path", "s3n://tweets1/tweet/"). \
     outputMode('append'). \
-    trigger(processingTime='15 seconds'). \ # Adjust based on how real time data needs to be for analysis
+    trigger(processingTime='15 seconds'). \
     partitionBy('company').start()
 
 query.awaitTermination()

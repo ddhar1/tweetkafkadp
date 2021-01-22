@@ -1,6 +1,6 @@
 from pyspark.sql import SparkSession
 import pyspark.sql.functions as f
-from pyspark.sql import types as T
+from pyspark.sql.types import ArrayType, IntegerType, LongType, StringType, TimestampType, StructType, StructField
 
 # Schema of Tweet and Tweet Metadata from Twitter API
 json_schema =StructType([

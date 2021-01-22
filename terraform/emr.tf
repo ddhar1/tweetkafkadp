@@ -1,11 +1,11 @@
 resource "aws_emr_cluster" "cluster" {
     name ="emr_for_sparkstreaming"
-    release_label = "emr-5.31.0"
+    release_label = "emr-6.2.0"
     applications = [ "Spark" ]
 
     termination_protection = false
 
-    service_role = "EMR_DefaultRole" #TODO: Insert role of choice
+    service_role = "EMR_DefaultRole" #TODO: Insert role of choice\
 
     ec2_attributes {
         subnet_id = aws_subnet.prod-subnet-public-1.id
@@ -17,11 +17,11 @@ resource "aws_emr_cluster" "cluster" {
     }
 
     master_instance_group {
-      instance_type ="c4.large"
+      instance_type ="m5.xlarge"
     }
 
     core_instance_group {
-      instance_type ="c1.xlarge"
+      instance_type ="m5.xlarge"
       instance_count = 2
 
       ebs_config {

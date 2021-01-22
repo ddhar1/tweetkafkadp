@@ -61,7 +61,8 @@ Add `BEARER_TOKEN` as environmental variable to system. One may initially run un
 * Continous Data quality checks on
 	* data that comes out of twitter api before it's sent to Kafka with TwitterProducer
 	* data from kafka in spark streaming, before it's saved as a parquet (tradeoff is that more latency)
+* Connect EC2 Instances to domain name - so that when I have to stutdown/restart Kafka, I don't have to change the ansible kafka installer, pyspark consumer, and java producer inputs
 * if spark streaming program is affected - how to use checkpoint data to automatically start from most recently collected offset?
-* Save Producer as a .jar file, run as a daemon process on an EC2 Instance
-* What would happen if AWS went down? (such as when AWS east went down recently)
+* Save Producer as a .jar file, and add parameters to allow one to submit kafka broker to send data to. run as a daemon process on an EC2 Instance
+* If EMR Cluster, and Kafka is still running, is there a way to automate starting from missed offsets? 
 * Adjust NLP script to classify tweets using [John Snow Lab's NLP Library](https://nlp.johnsnowlabs.com/)

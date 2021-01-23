@@ -14,7 +14,7 @@ The business use case can be for an investment firm. They may wants to understan
     
 
 ### Design Choices
-I chose to manage my own kafka cluster, and AWS EMR with spark structured streams to just get a chance to play around with these tecnologies. Ansible was helpful with installing Kafka on all the hosts programatically, restarting kafka cluster. Both terraform and ansible were helpful for documenting steps programatically for transparency, reproducibility.
+I chose to manage my own kafka cluster, and AWS EMR with spark structured streams to just get a chance to play around with these technologies. Ansible was helpful with installing Kafka on all the hosts programmatically, restarting kafka cluster. Both terraform and ansible were helpful for documenting steps programmatically for transparency, reproducibility.
 
 In a production environment, depending on how important this data is and what goals the team has, it may make more sense to *not* use self-managed kafka cluster, extra producer running manually/ec2 instance and even spark structured streaming. It's hard to maintain, and the large ec2 instances involved are costly per hour. I would probably choose just AWS Kinesis for this simple, low-streaming-rate application, with only one consumer. I would probably use lambda for processing the data. If I was using an CPU intensive ML model to classify the tweets, or needed more throughput, maybe an occasional batch processing job using EMR would be better.
 
@@ -53,10 +53,10 @@ Once the data starts coming into the Athena Folder, you can
 
 
 ## Possible Future Improvements
-* Continous Data quality checks on
+* Continuous Data quality checks on
 	* data that comes out of twitter api before it's sent to Kafka with TwitterProducer
 	* data from kafka in spark streaming, before it's saved as a parquet (tradeoff is that more latency)
-* Connect EC2 Instances to domain name - so that when I have to stutdown/restart Kafka, I don't have to change the ansible kafka installer, pyspark consumer, and java producer inputs
+* Connect EC2 Instances to domain name - so that when I have to shutdown/restart Kafka, I don't have to change the ansible kafka installer, pyspark consumer, and java producer inputs
 * Are there tests I can add to the consumer? At least integration tests
 * Save Producer as a .jar file, and add parameters to allow one to submit kafka broker to send data to. run as a daemon process on an EC2 Instance
 * If EMR Cluster, and Kafka is still running, is there a way to automate starting from missed offsets? 

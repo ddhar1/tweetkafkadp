@@ -52,17 +52,27 @@ Pre-set up:
 1. Set up Terraform: Go to ./terraform
 2. Run `terraform plan` to ensure that there are no issues with the terraform plan
 3. Run `terraform apply` to create aws resources
-### 2. Run Twitter Producer
+4. Go to ./ansible: `cd ../ansible/.`
+5. Update `./updateServers.sh` with newly created servers, and run the file: `./updateServers.sh`
+6. To install Kafka, and start Zookeeper and brokers: `ansible-playbook -i hosts.yml kafka.yml`
+7. See readme to create kafka topic in a broker
+### 3. Run Twitter Producer
 Add `BEARER_TOKEN` as environmental variable to system. One may initially run unit tests in `./twitterProducer/src/tests/.` to ensure that it's working
-1. Currently I run java project from IDE
-### 3. Run Twitter Consumer on AWS EMR
+1. Currently I run java project from IDE, though at some point may package it as a jar as a daemon process
+In `FilteredStreamDemo.java`, make sure to replace `bootstrapServers` with the server and port of one of the kafka cluster's brokers
+### 4. Run Twitter Consumer on AWS EMR
+1. In consumer.py, replace variable `BOOTSTRAP_SERVERS` with the list of the kafka brokers in the kafka cluster being used. Upload this consumer to a bucket in S3. Also can replace where spark structured streaming checkpoints  and actual output parquet data will be saved
+2. Submit the spark application to the AWS EMR cluster created with terraform. Look at `./twitterConsumer/readme.md` for AWS CLI command. 
+
+You should see the 
+
 
 ## Possible Future Improvements
 * Continous Data quality checks on
 	* data that comes out of twitter api before it's sent to Kafka with TwitterProducer
 	* data from kafka in spark streaming, before it's saved as a parquet (tradeoff is that more latency)
 * Connect EC2 Instances to domain name - so that when I have to stutdown/restart Kafka, I don't have to change the ansible kafka installer, pyspark consumer, and java producer inputs
-* if spark streaming program is affected - how to use checkpoint data to automatically start from most recently collected offset?
+* Are there tests I can add to the consumer? At least integration tests
 * Save Producer as a .jar file, and add parameters to allow one to submit kafka broker to send data to. run as a daemon process on an EC2 Instance
 * If EMR Cluster, and Kafka is still running, is there a way to automate starting from missed offsets? 
 * Adjust NLP script to classify tweets using [John Snow Lab's NLP Library](https://nlp.johnsnowlabs.com/)

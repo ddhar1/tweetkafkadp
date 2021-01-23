@@ -64,7 +64,8 @@ In `FilteredStreamDemo.java`, make sure to replace `bootstrapServers` with the s
 1. In consumer.py, replace variable `BOOTSTRAP_SERVERS` with the list of the kafka brokers in the kafka cluster being used. Upload this consumer to a bucket in S3. Also can replace where spark structured streaming checkpoints  and actual output parquet data will be saved
 2. Submit the spark application to the AWS EMR cluster created with terraform. Look at `./twitterConsumer/readme.md` for AWS CLI command. 
 
-You should see the 
+Once the data starts coming into the Athena Folder, you can 
+![Output Dataset in Athena](_img/outputdata.png)
 
 
 ## Possible Future Improvements

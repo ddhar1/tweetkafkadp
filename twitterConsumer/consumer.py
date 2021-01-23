@@ -3,7 +3,8 @@ import pyspark.sql.functions as f
 from pyspark.sql.types import ArrayType, StringType, StructType, StructField
 
 BOOTSTRAP_SERVERS = "34.213.179.50:9092,34.220.78.168:9092,34.210.71.28:9092"
-
+S3_CHECKPOINT_LOCATION = "s3n://tweets1/checkpoints/"
+S3_PARQUET_SINK = "s3n://tweets1/tweet/"
 # Schema of Tweet and Tweet Metadata from Twitter API
 json_schema =StructType([
     StructField("data",
@@ -47,8 +48,8 @@ tweets = tweets.withColumn( "word_count",  f.size(f.split(f.col('text'), ' '))  
 
 # Save set of data pulled from Kafka every 15 seconds
 query = tweets.writeStream.format("parquet"). \
-    option("checkpointLocation", "s3n://tweets1/checkpoints/"). \
-    option("path", "s3n://tweets1/tweet/"). \
+    option("checkpointLocation", S3_CHECKPOINT_LOCATION). \
+    option("path", S3_PARQUET_SINK). \
     outputMode('append'). \
     trigger(processingTime='15 seconds'). \
     partitionBy('company').start()

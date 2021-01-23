@@ -2,6 +2,8 @@ from pyspark.sql import SparkSession
 import pyspark.sql.functions as f
 from pyspark.sql.types import ArrayType, StringType, StructType, StructField
 
+BOOTSTRAP_SERVERS = "34.213.179.50:9092,34.220.78.168:9092,34.210.71.28:9092"
+
 # Schema of Tweet and Tweet Metadata from Twitter API
 json_schema =StructType([
     StructField("data",
@@ -29,7 +31,7 @@ spark = SparkSession \
 df = spark \
   .readStream \
   .format("kafka") \
-  .option("kafka.bootstrap.servers", "34.213.179.50:9092,34.220.78.168:9092,34.210.71.28:9092") \
+  .option("kafka.bootstrap.servers", BOOTSTRAP_SERVERS) \
   .option("subscribe", "twitter_on_stocks") \
   .option("failOnDataLoss", "false") \
   .load()
